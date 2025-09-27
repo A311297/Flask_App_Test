@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'my-secret-pw'   # Set the root password for MySQL
+      MYSQL_DATABASE: 'python_3_10_2'       # Create a database with this name
+      MYSQL_USER: 'myuser'                  # Create a user with this username
+      MYSQL_PASSWORD: 'mypassword'          # Set the password for the created user
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  web:
+    build:
+      context: .   # Use current directory as context
+      dockerfile: Dockerfile
+    volumes:
+      - ./app:/app  # Mount app folder
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - MYSQL_HOST=db  # Hostname of the MySQL container
+      - MYSQL_USER=myuser
+      - MYSQL_PASSWORD=mypassword
+      - MYSQL_DB=python_3_10_2
+      - MYSQL_PORT=3306
+
+volumes:
+  mysql_data:
